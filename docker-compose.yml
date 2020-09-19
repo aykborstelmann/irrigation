@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+    sensor-controller:
+        build:
+            context: .
+            dockerfile: sensor-controller/Dockerfile
