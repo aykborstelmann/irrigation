@@ -1,9 +1,13 @@
-FROM gradle:6.3-jdk11 AS build
-WORKDIR /usr/src/build
-COPY --chown=gradle:gradle . /usr/src/build/
-RUN gradle :sensor-controller:build :sensor-controller:bootJar --no-daemon
+FROM gradle:6.6-jdk11 AS build
+RUN mkdir -p /home/gradle/cache_home
+WORKDIR /home/gradle/app
+COPY build.gradle settings.gradle buildSrc/ /home/gradle/app/
+COPY */build.gradle /home/gradle/app/*/
+RUN gradle clean build -x test -i --stacktrace
+COPY . /home/gradle/app
+RUN gradle clean :sensor-controller:build :sensor-controller:bootJar
 
-FROM openjdk:11-jre
+FROM adoptopenjdk:11-jre-hotspot
 WORKDIR /usr/src/app
-COPY --from=build /usr/src/build/sensor-controller/build/libs/*.jar application.jar
+COPY --from=build /home/gradle/app/sensor-controller/build/libs/*.jar application.jar
 CMD ["java", "-jar","/usr/src/app/application.jar"]
