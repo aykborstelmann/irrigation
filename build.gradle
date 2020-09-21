@@ -12,6 +12,12 @@ allprojects {
     targetCompatibility = '11'
 }
 
+ssh.settings {
+    if (project.hasProperty("deploy.allowAnyHosts")) {
+        knownHosts = allowAnyHosts
+    }
+}
+
 task deploy(type: org.irrigation.gradle.DeployTask) {
     description = "Deploys to Server"
 }
