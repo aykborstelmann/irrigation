@@ -2,6 +2,6 @@ version: '3'
 
 services:
     sensor-controller:
-        build:
-            context: .
-            dockerfile: sensor-controller/Dockerfile
+        image: 'irrigation/sensor-controller:latest'
+        ports:
+        -   "80:80"
