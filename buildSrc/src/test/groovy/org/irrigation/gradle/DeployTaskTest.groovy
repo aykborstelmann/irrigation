@@ -125,7 +125,6 @@ class DeployTaskTest {
 
     @DisplayName("All properties")
     @Nested
-    @Disabled
     class Running {
         @Test
         void executesCorrectCommands() {
@@ -146,24 +145,12 @@ class DeployTaskTest {
                     def executions = capturedCommands.executeArguments;
 
                     assertThat(executions)
-                        .element(0)
-                        .as("Stop docker compose")
-                        .isEqualTo("cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose ]; then cd irrigation_local; docker-compose down; fi;")
-
-                    assertThat(executions)
-                        .element(1)
-                        .as("Should clone repo from GitHub if not exists and move into it")
-                        .isEqualTo("cd ~; if ! test -d irrigation; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;")
-
-                    assertThat(executions)
-                        .element(2)
-                        .as("Should checkout default branch")
-                        .isEqualTo("cd ~/irrigation/; git pull; if [[ -z \$(git branch --list master) ]] ; then git checkout -b master origin/master; fi;")
-
-                    assertThat(executions)
-                        .element(3)
-                        .as("Should run docker-compose daemonized")
-                        .isEqualTo("cd ~/irrigation/; docker-compose up -d")
+                        .containsExactly(
+                            "cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose.yml ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose.yml ]; then cd irrigation_local; docker-compose down; fi;",
+                            "cd ~; if [ ! -d irrigation ]; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;",
+                            "cd ~/irrigation/; git pull; if [ -z \$(git branch --list master) ] ; then git checkout -b master origin/master; fi;",
+                            "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
+                        )
                 }
 
 
@@ -190,30 +177,17 @@ class DeployTaskTest {
                     List<String> executions = capturedCommands.executeArguments;
 
                     assertThat(executions)
-                        .element(0)
-                        .as("Stop docker compose")
-                        .isEqualTo("cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose ]; then cd irrigation_local; docker-compose down; fi;")
-
-                    assertThat(executions)
-                        .element(1)
-                        .as("Should clone repo from GitHub if not exists and move into it")
-                        .isEqualTo("cd ~; if ! test -d irrigation; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;")
-
-                    assertThat(executions)
-                        .element(2)
-                        .as("Should checkout default branch")
-                        .isEqualTo("cd ~/irrigation/; git pull; if [[ -z \$(git branch --list feature/test) ]] ; then git checkout -b feature/test origin/feature/test; fi;")
-
-                    assertThat(executions)
-                        .element(3)
-                        .as("Should run docker-compose daemonized")
-                        .isEqualTo("cd ~/irrigation/; docker-compose up -d")
+                        .containsExactly(
+                            "cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose.yml ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose.yml ]; then cd irrigation_local; docker-compose down; fi;",
+                            "cd ~; if [ ! -d irrigation ]; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;",
+                            "cd ~/irrigation/; git pull; if [ -z \$(git branch --list feature/test) ] ; then git checkout -b feature/test origin/feature/test; fi;",
+                            "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
+                        )
                 }
 
 
         }
 
-        @Disabled
         @Test
         void useLocalCopy() {
             def deployTask = project.task("deploy", type: DeployTask) as DeployTask
@@ -236,32 +210,24 @@ class DeployTaskTest {
                     List<HashMap> puts = capturedCommands.putArguments;
 
                     assertThat(executions)
-                        .element(0)
-                        .as("Stop docker compose")
-                        .isEqualTo("cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose ]; then cd irrigation_local; docker-compose down; fi;")
-
-                    assertThat(executions)
-                        .element(1)
-                        .as("Should create directory")
-                        .isEqualTo("cd ~ && pwd")
+                        .containsExactly(
+                            "cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose.yml ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose.yml ]; then cd irrigation_local; docker-compose down; fi;",
+                            "mkdir -p ~/irrigation_temp && cd ~/irrigation_temp && pwd",
+                            "cd ~; if [ -d irrigation_local ]; then rm -r irrigation_local; fi; mv irrigation_temp/*/ irrigation_local; rm -r ~/irrigation_temp",
+                            "cd ~/irrigation_local/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
+                        )
 
                     assertThat(puts)
                         .singleElement()
-                        .as("Copies local directory to remote")
                         .satisfies { map ->
                             assertThat(map)
                                 .hasEntrySatisfying("from") { value ->
                                     assertThat(value).isEqualTo(project.rootDir)
                                 }
                                 .hasEntrySatisfying("into") { value ->
-                                    assertThat(value as String).isEqualTo("/home/pi/somepath/irrigation_local/")
+                                    assertThat(value as String).isEqualTo("/home/pi/somepath")
                                 }
                         }
-
-                    assertThat(executions)
-                        .element(2)
-                        .as("Should run docker-compose daemonized")
-                        .isEqualTo("cd ~/irrigation_local/; docker-compose up -d")
                 }
         }
 

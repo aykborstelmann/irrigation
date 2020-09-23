@@ -60,10 +60,9 @@ class DeployTask extends DefaultTask {
                     execute "cd ~/irrigation/; git pull; if [ -z \$(git branch --list $branch) ] ; then git checkout -b $branch origin/$branch; fi;"
 
                     println "Build docker images and run docker-compose"
-                    execute "cd ~/irrigation/; docker-compose build && docker-compose up -d"
+                    execute "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
                 } else {
-                    execute "Copy local version to remote"
-
+                    println "Copy local version to remote"
                     def path = execute "mkdir -p ~/irrigation_temp && cd ~/irrigation_temp && pwd"
                     put from: project.getRootDir(), into: path, filter: { File file ->
                         def filePath = file.toPath().toString()
@@ -73,7 +72,7 @@ class DeployTask extends DefaultTask {
                     execute "cd ~; if [ -d irrigation_local ]; then rm -r irrigation_local; fi; mv irrigation_temp/*/ irrigation_local; rm -r ~/irrigation_temp"
 
                     println "Build docker images and run docker-compose"
-                    execute "cd ~/irrigation_local/; docker-compose build && docker-compose up -d"
+                    execute "cd ~/irrigation_local/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
                 }
             }
         }
