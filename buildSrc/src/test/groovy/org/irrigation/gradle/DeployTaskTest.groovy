@@ -148,7 +148,7 @@ class DeployTaskTest {
                         .containsExactly(
                             "cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose.yml ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose.yml ]; then cd irrigation_local; docker-compose down; fi;",
                             "cd ~; if [ ! -d irrigation ]; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;",
-                            "cd ~/irrigation/; git pull; if [ -z \$(git branch --list master) ] ; then git checkout -b master origin/master; fi;",
+                            "cd ~/irrigation/; git fetch -p; if [ -z \$(git branch --list master) ] ; then git checkout -b master origin/master; else git checkout master; fi; git reset --hard origin/master",
                             "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
                         )
                 }
@@ -180,7 +180,7 @@ class DeployTaskTest {
                         .containsExactly(
                             "cd ~; if [ -d irrigation ] && [ -f irrigation/docker-compose.yml ]; then cd irrigation; docker-compose down; fi; cd ~; if [ -d irrigation_local ] && [ -f irrigation_local/docker-compose.yml ]; then cd irrigation_local; docker-compose down; fi;",
                             "cd ~; if [ ! -d irrigation ]; then git clone https://github.com/aykborstelmann/irrigation.git irrigation; fi;",
-                            "cd ~/irrigation/; git pull; if [ -z \$(git branch --list feature/test) ] ; then git checkout -b feature/test origin/feature/test; fi;",
+                            "cd ~/irrigation/; git fetch -p; if [ -z \$(git branch --list feature/test) ] ; then git checkout -b feature/test origin/feature/test; else git checkout feature/test; fi; git reset --hard origin/feature/test",
                             "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
                         )
                 }

@@ -57,7 +57,7 @@ class DeployTask extends DefaultTask {
                     execute "cd ~; if [ ! -d irrigation ]; then git clone $REPOSITORY_URL irrigation; fi;"
 
                     println "Pull and checkout $branch"
-                    execute "cd ~/irrigation/; git pull; if [ -z \$(git branch --list $branch) ] ; then git checkout -b $branch origin/$branch; fi;"
+                    execute "cd ~/irrigation/; git fetch -p; if [ -z \$(git branch --list $branch) ] ; then git checkout -b $branch origin/$branch; else git checkout $branch; fi; git reset --hard origin/$branch"
 
                     println "Build docker images and run docker-compose"
                     execute "cd ~/irrigation/; chmod +x gradlew && ./gradlew docker && docker-compose up -d"
