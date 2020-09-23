@@ -2,6 +2,31 @@ version: '3'
 
 services:
     sensor-controller:
-        image: 'irrigation/sensor-controller:latest'
+        image: irrigation/sensor-controller
         ports:
         -   "80:80"
+        depends_on:
+            -   mosquitto
+    homeassistant:
+        image: homeassistant/home-assistant
+        restart: always
+        volumes:
+            - ./hass-config:/config
+        ports:
+            - "8123:8123"
+        depends_on:
+            - mosquitto
+    mosquitto:
+        image: eclipse-mosquitto
+        restart: always
+        volumes:
+            - ./mosquitto-config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+            - data:/mosquitto/data
+            - log:/mosquitto/log
+        ports:
+            - "1883:1883"
+            - "9001:9001"
+
+volumes:
+    data:
+    log:
