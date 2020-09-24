@@ -1,0 +1,4 @@
+docker {
+    files "scripts.yaml", "scenes.yaml", "groups.yaml", "configuration.yaml", "automations.yaml"
+    name "irrigation/homeassistant"
+}

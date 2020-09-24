@@ -1,2 +1,3 @@
 rootProject.name = 'irrigation'
 include 'sensor-controller'
+include 'mosquitto', 'hass'
