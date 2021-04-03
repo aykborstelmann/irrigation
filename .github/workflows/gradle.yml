@@ -59,7 +59,6 @@ jobs:
       uses: shimataro/ssh-key-action@v2
       with:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        name: deploy_id_rsa
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
     - name: Gradle build
       run: ./gradlew build
@@ -67,4 +66,3 @@ jobs:
       run: docker-compose build
     - name: Docker compose deploy
       run: docker-compose up -d
-      
