@@ -2,13 +2,13 @@ version: '3'
 
 services:
     sensor-controller:
-        image: irrigation/sensor-controller
+        build: sensor-controller/
         ports:
             - "80:80"
         depends_on:
             - mosquitto
     homeassistant:
-        image: irrigation/homeassistant
+        build: hass/
         restart: always
         volumes:
             - hass-config:/config
@@ -17,7 +17,7 @@ services:
         depends_on:
             - mosquitto
     mosquitto:
-        image: irrigation/mosquitto
+        build: mosquitto/
         restart: always
         volumes:
             - mosquitto-data:/mosquitto/data
