@@ -62,7 +62,5 @@ jobs:
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
     - name: Gradle build
       run: ./gradlew build
-    - name: Docker build
-      run: docker-compose build
     - name: Docker compose deploy
-      run: docker-compose up -d
+      run: docker-compose up -d --build
