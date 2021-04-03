@@ -66,6 +66,6 @@ jobs:
     - name: Docker context ls and docker ps
       run: docker context ls && docker-compose ps
     - name: Docker build
-      run: docker-compose build --log-level info
+      run: docker-compose --log-level info build
     - name: Docker compose deploy
-      run: docker-compose up -d --log-level info
+      run: docker-compose --log-level info up -d
