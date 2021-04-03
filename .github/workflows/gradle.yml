@@ -61,9 +61,11 @@ jobs:
       run: ./gradlew build
     - name: Create docker remote context
       run: docker context create remote --docker "host=ssh://${{ secrets.DEV_USER }}@${{ secrets.DEV_HOST }}"
+    - name: Use remote context
+      run: docker context use remote
     - name: Docker context ls and docker ps
-      run: docker context ls && docker-compose --context remote ps
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+      run: docker context ls && docker-compose ps
+    - name: Docker build
+      run: docker-compose build --log-level info
     - name: Docker compose deploy
-      run: docker-compose --context remote up --build -d
+      run: docker-compose up -d --log-level info
