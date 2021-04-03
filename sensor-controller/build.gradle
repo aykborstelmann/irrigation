@@ -33,8 +33,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-docker {
-    files tasks.bootJar.outputs
-    name = "irrigation/sensor-controller"
-}
