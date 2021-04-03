@@ -34,8 +34,6 @@ jobs:
       
   deploy: 
     runs-on: ubuntu-latest
-    env:
-        DOCKER_HOST: ssh://${{ secrets.DEV_USER }}@${{ secrets.DEV_HOST }} 
     needs: build
     if: github.ref == 'refs/heads/master'
     steps:
@@ -62,5 +60,11 @@ jobs:
         known_hosts: ${{ secrets.KNOWN_HOSTS }}
     - name: Gradle build
       run: ./gradlew build
+    - uses: arwynfr/actions-docker-context@v1
+      with:
+        docker_host: ssh://${{ secrets.DEV_USER }}@${{ secrets.DEV_HOST }} 
+        context_name: 'dev-server'
+        ssh_cert: ${{ secrets.KNOWN_HOSTS }}
+        ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Docker compose deploy
-      run: docker-compose up -d --build
+      run: docker-compose --context dev-server up -d --build
