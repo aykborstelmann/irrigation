@@ -60,7 +60,7 @@ jobs:
     - name: Gradle build
       run: ./gradlew build
     - name: Create docker remote context
-      run: docker context create remote --docker "host=ssh://${{ secrets.DEV_USER }}@{{ secrets.DEV_HOST }}"
+      run: docker context create remote --docker "host=ssh://${{ secrets.DEV_USER }}@${{ secrets.DEV_HOST }}"
     - name: Use remote context
       run: docker context use remote
     - name: Docker context ls and docker ps
