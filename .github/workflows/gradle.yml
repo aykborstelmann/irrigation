@@ -11,7 +11,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -63,10 +62,10 @@ jobs:
       run: docker context create remote --docker "host=ssh://${{ secrets.DEV_USER }}@${{ secrets.DEV_HOST }}"
     - name: Use remote context
       run: docker context use remote
-    - name: Docker context ls and docker ps
-      run: docker context ls && docker-compose ps
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
+    - name: Docker context ls and docker ps
+      run: docker context ls && docker-compose ps
     - name: Docker build
       run: docker-compose --log-level info build
     - name: Docker compose deploy
